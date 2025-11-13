@@ -9,8 +9,8 @@ const userSchema = new mongoose.Schema({
   address: { type: String },
   role: {
     type: String,
-    enum: ["guest", "customer", "admin"],
-    default: "guest",
+    enum: ["user", "admin"],
+    default: "user",
   },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

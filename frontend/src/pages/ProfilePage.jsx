@@ -33,7 +33,7 @@ export default function ProfilePage() {
 
     const fetchProfile = async () => {
       try {
-        const res = await axios.get("http://localhost:5001/api/profile", {
+        const res = await axios.get("http://localhost:5001/api/auth/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setProfile(res.data.user);
@@ -70,7 +70,7 @@ export default function ProfilePage() {
 
     try {
       const res = await axios.put(
-        "http://localhost:5001/api/change-password",
+        "http://localhost:5001/api/auth/change-password",
         { currentPassword: oldPassword, newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -93,7 +93,7 @@ export default function ProfilePage() {
     setDeleteError("");
 
     try {
-      await axios.delete("http://localhost:5001/api/delete-account", {
+      await axios.delete("http://localhost:5001/api/auth/delete-account", {
         headers: { Authorization: `Bearer ${token}` },
         data: { password: deletePassword },
       });

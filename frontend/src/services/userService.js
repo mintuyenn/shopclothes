@@ -1,5 +1,5 @@
 import axios from "axios";
-const API_URL = "http://localhost:5001/api";
+const API_URL = "http://localhost:5001/api/auth";
 
 export const getAllUsers = async (token) => {
   const response = await axios.get(`${API_URL}/users`, {

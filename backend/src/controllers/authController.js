@@ -7,9 +7,20 @@ export const register = async (req, res) => {
   try {
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
-      return res.status(400).json({ message: "Người dùng đã tồn tại" });
+      return res.status(400).json({ message: "Tài khoản đã tồn tại" });
     }
+
     const hashedPassword = await bcrypt.hash(password, 12);
+
+    let role = "user";
+    const adminEmails = [
+      "caotuyen281005@gmail.com",
+      "tuyencao281005@gmail.com",
+    ];
+    if (adminEmails.includes(email.toLowerCase())) {
+      role = "admin";
+    }
+
     const newUser = new User({
       username,
       password: hashedPassword,
@@ -17,9 +28,11 @@ export const register = async (req, res) => {
       email,
       phone,
       address,
+      role,
     });
+
     await newUser.save();
-    res.status(201).json({ message: "Đăng ký người dùng thành công" });
+    res.status(201).json({ message: "Đăng ký thành công" });
   } catch (error) {
     res.status(500).json({ message: "Lỗi máy chủ" });
   }
@@ -40,12 +53,12 @@ export const login = async (req, res) => {
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "7d",
       }
     );
     res.status(200).json({ token, user });
   } catch (error) {
-    console.error("Login error:", error); // log chi tiết
+    console.error("Lỗi đăng nhập:", error);
     res.status(500).json({ message: "Lỗi máy chủ" });
   }
 };
@@ -69,7 +82,7 @@ export const refreshToken = (req, res) => {
     const newToken = jwt.sign(
       { id: decoded.id, role: decoded.role },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "7d" }
     );
 
     res.status(200).json({ token: newToken });
@@ -125,9 +138,24 @@ export const checkEmailExists = async (req, res) => {
 
 export const deleteAccount = async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.userId);
+    const { password } = req.body;
+
+    if (!req.user) return res.status(404).json({ message: "User not found" });
+
+    // Lấy lại user để có password
+    const userWithPassword = await User.findById(req.user._id);
+    if (!userWithPassword)
+      return res.status(404).json({ message: "User not found" });
+
+    const isMatch = await bcrypt.compare(password, userWithPassword.password);
+    if (!isMatch)
+      return res.status(400).json({ message: "Mật khẩu không đúng" });
+
+    await User.findByIdAndDelete(req.user._id);
+
     res.json({ message: "Xóa tài khoản thành công" });
   } catch (err) {
+    console.error("Delete account error:", err);
     res.status(500).json({ message: err.message });
   }
 };

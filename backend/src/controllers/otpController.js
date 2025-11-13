@@ -1,16 +1,14 @@
-import Otp from "../models/Otp.js";
+import Otp from "../models/otpModel.js";
 import bcrypt from "bcryptjs";
 import User from "../models/userModel.js";
 
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const expires = new Date(Date.now() + 5 * 60 * 1000); // OTP expires in 5 minutes
+  const expires = new Date(Date.now() + 5 * 60 * 1000); // OTP có thời hạn 5 phút
 
   await Otp.create({ email, code: otp, createdAt: new Date() });
 
-  // Here you would typically send the OTP to the user's email.
-  // For simplicity, we'll just return it in the response.
   res.status(200).json({ message: "OTP sent", otp });
 };
 export const resetPassword = async (req, res) => {
@@ -22,7 +20,7 @@ export const resetPassword = async (req, res) => {
   if (record.expires < Date.now()) {
     return res.status(400).json({ message: "OTP đã hết hạn" });
   }
-  // Hash the new password
+  // Hash mật khẩu mới
   const hashedPassword = await bcrypt.hash(newPassword, 12);
   const user = await User.findOneAndUpdate(
     { email },
