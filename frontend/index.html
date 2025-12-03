@@ -9,25 +9,39 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-
-    <script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
     <script>
-      new CozeWebSDK.WebChatClient({
-        config: {
-          bot_id: "7578060301766098997",
-        },
-        componentProps: {
-          title: "Coze",
-        },
-        auth: {
-          type: "token",
-          token:
-            "pat_GDbMxXmlz6D4o32zy3bNed4fQu2uoiPxXbuDlGB8KDQb32pYMph2l6Yj8Eybq53n",
-          onRefreshToken: function () {
-            return "pat_GDbMxXmlz6D4o32zy3bNed4fQu2uoiPxXbuDlGB8KDQb32pYMph2l6Yj8Eybq53n";
-          },
-        },
-      });
-    </script>
-  </body>
+ window.difyChatbotConfig = {
+  token: 'ZRiQFboRIZr8om4T',
+  inputs: {
+    // You can define the inputs from the Start node here
+    // key is the variable name
+    // e.g.
+    // name: "NAME"
+  },
+  systemVariables: {
+    // user_id: 'YOU CAN DEFINE USER ID HERE',
+    // conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
+  },
+  userVariables: {
+    // avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
+    // name: 'YOU CAN DEFINE USER NAME HERE',
+  },
+ }
+</script>
+<script
+ src="https://udify.app/embed.min.js"
+ id="ZRiQFboRIZr8om4T"
+ defer>
+</script>
+<style>
+  #dify-chatbot-bubble-button {
+    background-color: #1C64F2 !important;
+  }
+  #dify-chatbot-bubble-window {
+    width: 24rem !important;
+    height: 40rem !important;
+  }
+</style>
+<body>
+
 </html>
