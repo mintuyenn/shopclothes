@@ -10,6 +10,7 @@ const DiscountManager = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
   const [form, setForm] = useState({
     name: "",
@@ -26,10 +27,9 @@ const DiscountManager = () => {
   // ===== Fetch discounts =====
   const fetchDiscounts = async () => {
     try {
-      const { data } = await axios.get(
-        "http://localhost:5001/api/admin/discounts",
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const { data } = await axios.get(`${API_URL}/admin/discounts`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setDiscounts(data.success ? data.data : []);
     } catch (err) {
       console.error(err);
@@ -59,14 +59,12 @@ const DiscountManager = () => {
     setSaving(true);
     try {
       if (editingId) {
-        await axios.put(
-          `http://localhost:5001/api/admin/discounts/${editingId}`,
-          form,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await axios.put(`${API_URL}/admin/discounts/${editingId}`, form, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         Swal.fire("Thành công", "Cập nhật mã giảm giá thành công", "success");
       } else {
-        await axios.post("http://localhost:5001/api/admin/discounts", form, {
+        await axios.post(`${API_URL}/admin/discounts`, form, {
           headers: { Authorization: `Bearer ${token}` },
         });
         Swal.fire("Thành công", "Tạo mã giảm giá mới thành công", "success");
@@ -123,7 +121,7 @@ const DiscountManager = () => {
     if (!result.isConfirmed) return;
 
     try {
-      await axios.delete(`http://localhost:5001/api/admin/discounts/${id}`, {
+      await axios.delete(`${API_URL}/admin/discounts/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       Swal.fire("Đã xóa", "Mã giảm giá đã bị xóa", "success");

@@ -8,6 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token") || null);
   const [loading, setLoading] = useState(true);
+  const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
   // Fetch profile khi token thay đổi
   useEffect(() => {
@@ -22,7 +23,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("token", token);
 
       try {
-        const res = await axios.get("http://localhost:5001/api/auth/profile", {
+        const res = await axios.get(`${API_URL}/auth/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

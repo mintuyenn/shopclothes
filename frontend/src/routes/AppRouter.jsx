@@ -30,6 +30,8 @@ import PaymentResultPage from "../pages/PaymentResultPage";
 import OrderDetailPage from "../pages/OrderDetailPage";
 import ReviewPage from "../pages/ReviewPage";
 import UserLayout from "../layouts/UserLayout";
+import NewArrivals from "../pages/NewArrivals";
+import LoginSuccess from "../pages/LoginSuccess";
 
 // --- Admin Components (NEW) ---
 import AdminLayout from "../layouts/AdminLayout";
@@ -54,12 +56,14 @@ export default function AppRouter() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/product/:id" element={<ProductDetailPage />} />
           <Route path="/products" element={<ProductPage />} />
+          <Route path="/products/new-arrivals" element={<NewArrivals />} />
 
           <Route path="/warrant-policy" element={<WarrantyPolicyPage />} />
           <Route path="/store-system" element={<StoreSystemPage />} />
           <Route path="/user-guide-pro" element={<UserGuideProPage />} />
           <Route path="/member-policy" element={<MemberPolicyPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/login-success" element={<LoginSuccess />} />
 
           {/* Private User Routes */}
           <Route

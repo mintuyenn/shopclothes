@@ -19,17 +19,18 @@ const ProductForm = () => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false); 
   const [uploadingGallery, setUploadingGallery] = useState(false); 
+  const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
   const getPreview = (path) => {
     if(!path) return null;
-    return path.startsWith("http") ? path : `http://localhost:5001${path}`;
+    return path.startsWith("http") ? path : `${API_URL}${path}`;
   }
 
   useEffect(() => {
     if (isEditMode) {
       const fetchProduct = async () => {
         try {
-          const { data } = await axios.get(`http://localhost:5001/api/products/${id}`);
+          const { data } = await axios.get(`${API_URL}/products/${id}`);
           
           let catName = "";
           if (data.categoryId && data.categoryId.name) catName = data.categoryId.name;
@@ -132,7 +133,7 @@ const ProductForm = () => {
     fd.append("image", file);
     setUploading(true);
     try {
-        const { data } = await axios.post("http://localhost:5001/api/upload", fd, { headers: { "Content-Type": "multipart/form-data" } });
+        const { data } = await axios.post(`${API_URL}/upload`, fd, { headers: { "Content-Type": "multipart/form-data" } });
         setFormData(prev => ({ ...prev, image: data }));
         setUploading(false);
     } catch (error) { 
@@ -148,7 +149,7 @@ const ProductForm = () => {
           const uploadPromises = files.map(async (file) => {
               const fd = new FormData();
               fd.append("image", file);
-              const { data } = await axios.post("http://localhost:5001/api/upload", fd, { headers: { "Content-Type": "multipart/form-data" } });
+              const { data } = await axios.post(`${API_URL}/upload`, fd, { headers: { "Content-Type": "multipart/form-data" } });
               return data;
           });
           const uploadedUrls = await Promise.all(uploadPromises);
@@ -216,8 +217,8 @@ const ProductForm = () => {
           images: finalAllImages 
       };
 
-      if (isEditMode) await axios.put(`http://localhost:5001/api/admin/products/${id}`, payload, config);
-      else await axios.post("http://localhost:5001/api/admin/products", payload, config);
+      if (isEditMode) await axios.put(`${API_URL}/admin/products/${id}`, payload, config);
+      else await axios.post(`${API_URL}/admin/products`, payload, config);
 
       Swal.fire("Thành công", "Đã lưu sản phẩm!", "success");
       navigate("/admin/products");

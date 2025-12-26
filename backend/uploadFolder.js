@@ -12,7 +12,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const folderPath = "D:/anh-tam/phukien/vi"; // thư mục local chứa ảnh
+const folderPath = "D:/shop-clothes/frontend/src/assets"; // thư mục local chứa ảnh
 const cloudFolder = "myclothes"; // folder trên Cloudinary
 
 async function uploadImages() {

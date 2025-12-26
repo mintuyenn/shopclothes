@@ -9,11 +9,12 @@ const ProductManager = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
   const fetchProducts = async () => {
     try {
         const token = localStorage.getItem("token");
-        const { data } = await axios.get("http://localhost:5001/api/admin/products", {
+        const { data } = await axios.get(`${API_URL}/admin/products`, {
             headers: { Authorization: `Bearer ${token}` }
         });
         setProducts(data.data || []);
@@ -33,7 +34,7 @@ const ProductManager = () => {
     }).then(res => res.isConfirmed)) {
         try {
             const token = localStorage.getItem("token");
-            await axios.delete(`http://localhost:5001/api/admin/products/${id}`, {
+            await axios.delete(`${API_URL}/admin/products/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             Swal.fire("Đã xóa", "", "success");
@@ -77,7 +78,7 @@ const ProductManager = () => {
       if (imgPath.startsWith("http")) return imgPath;
 
       // Nếu là ảnh Local -> Thêm domain backend
-      return `http://localhost:5001${imgPath}`;
+      return `${API_URL}${imgPath}`;
   };
   // ✅ LOGIC TÍNH TỔNG KHO (Cộng dồn từ Variants)
   const getProductStock = (product) => {

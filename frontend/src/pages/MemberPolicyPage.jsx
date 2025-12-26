@@ -1,89 +1,79 @@
-// src/pages/MemberPolicyPage.jsx
 import React from "react";
 import * as Motion from "framer-motion";
-import { Star, Gift, Shield, Percent } from "lucide-react";
+import {
+  Crown,
+  Gift,
+  ShieldCheck,
+  Ticket,
+  TrendingUp,
+  Users,
+} from "lucide-react";
 
 const policies = [
   {
-    icon: <Star size={36} className="text-yellow-500" />,
+    icon: <Crown strokeWidth={1.5} />,
     title: "Thành viên Vàng",
     description:
-      "Nhận ưu đãi 15% cho mọi sản phẩm, quà sinh nhật hàng năm và trải nghiệm VIP tại cửa hàng. Quyền lợi này áp dụng tự động khi đạt mốc điểm thưởng.",
+      "Giảm trực tiếp 15% trọn đời. Đặc quyền thử đồ tại phòng VIP và ưu tiên thanh toán.",
   },
   {
-    icon: <Gift size={36} className="text-pink-500" />,
-    title: "Quà tặng & Ưu đãi",
+    icon: <Gift strokeWidth={1.5} />,
+    title: "Quà tặng Sinh nhật",
     description:
-      "Thưởng quà định kỳ, voucher giảm giá, điểm thưởng khi mua sắm và cơ hội tham gia các chương trình giới hạn dành riêng cho thành viên.",
+      "Nhận voucher mua sắm trị giá tới 1.000.000đ và bánh kem vào tháng sinh nhật của bạn.",
   },
   {
-    icon: <Shield size={36} className="text-blue-500" />,
-    title: "Bảo mật & An toàn",
+    icon: <ShieldCheck strokeWidth={1.5} />,
+    title: "Bảo mật tuyệt đối",
     description:
-      "Thông tin cá nhân và giao dịch của thành viên được bảo mật tuyệt đối. Hệ thống thanh toán an toàn, được mã hóa chuẩn SSL.",
+      "Dữ liệu cá nhân và lịch sử mua hàng được mã hóa chuẩn SSL, cam kết không chia sẻ với bên thứ 3.",
   },
   {
-    icon: <Percent size={36} className="text-green-500" />,
-    title: "Ưu đãi đặc biệt",
+    icon: <Ticket strokeWidth={1.5} />,
+    title: "Voucher độc quyền",
     description:
-      "Nhận mã giảm giá độc quyền, tham gia flash sale trước người khác, và truy cập các sản phẩm giới hạn chỉ dành cho thành viên.",
+      "Truy cập kho voucher giới hạn hàng tháng. Tham gia Flash Sale sớm hơn 30 phút.",
   },
   {
-    icon: <Star size={36} className="text-purple-500" />,
-    title: "Tích điểm & Thăng hạng",
+    icon: <TrendingUp strokeWidth={1.5} />,
+    title: "Tích điểm hoàn tiền",
     description:
-      "Mỗi đơn hàng đều tích lũy điểm thưởng. Khi đạt mốc điểm, bạn có thể thăng hạng thành viên và mở khóa thêm quyền lợi.",
+      "Tích lũy 5-10% giá trị mỗi đơn hàng vào ví điểm thưởng. Sử dụng điểm như tiền mặt.",
   },
   {
-    icon: <Gift size={36} className="text-orange-500" />,
-    title: "Sự kiện & Workshop",
+    icon: <Users strokeWidth={1.5} />,
+    title: "Private Workshop",
     description:
-      "Tham gia các sự kiện offline và workshop thời trang do ShopClothes tổ chức, dành riêng cho hội viên tích cực.",
+      "Thư mời tham dự các buổi ra mắt bộ sưu tập mới và workshop styling cá nhân.",
   },
 ];
 
 const containerVariants = {
   hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.15,
-    },
-  },
+  visible: { transition: { staggerChildren: 0.1 } },
 };
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 50 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: "easeOut" },
-  },
-  hover: { scale: 1.03, boxShadow: "0px 20px 40px rgba(0,0,0,0.15)" },
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
 export default function MemberPolicyPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 pt-24 px-6 md:px-16 font-sans">
+    <div className="min-h-screen bg-white pt-[120px] pb-24 px-4 md:px-8 font-sans text-gray-900">
       {/* Header */}
-      <Motion.motion.div
-        initial={{ opacity: 0, y: -60 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="text-center mb-16"
-      >
-        <h1 className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-pink-600 mb-6">
-          Chính sách thành viên ShopClothes
+      <div className="max-w-3xl mx-auto text-center mb-16">
+        <h1 className="text-3xl md:text-5xl font-bold uppercase tracking-tight mb-4">
+          CHÍNH SÁCH THÀNH VIÊN
         </h1>
-        <p className="text-gray-700 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
-          Trở thành thành viên để trải nghiệm ưu đãi độc quyền, tích điểm mua
-          sắm, nhận quà và tham gia các sự kiện VIP. Dưới đây là toàn bộ quyền
-          lợi bạn sẽ được hưởng khi đồng hành cùng ShopClothes.
+        <p className="text-gray-500 text-lg">
+          Đặc quyền dành riêng cho thành viên ShopClothes.
         </p>
-      </Motion.motion.div>
+      </div>
 
-      {/* Policies Grid */}
+      {/* Grid */}
       <Motion.motion.div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+        className="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
@@ -93,35 +83,28 @@ export default function MemberPolicyPage() {
           <Motion.motion.div
             key={idx}
             variants={cardVariants}
-            whileHover="hover"
-            className="bg-white rounded-2xl p-6 flex flex-col items-center text-center cursor-pointer shadow-md hover:shadow-xl transition"
+            className="group flex flex-col items-start p-6 rounded-2xl border border-transparent hover:border-gray-100 hover:shadow-2xl hover:shadow-gray-200/50 transition-all duration-300"
           >
-            <div className="mb-4">{policy.icon}</div>
-            <h3 className="text-xl md:text-2xl font-bold mb-3">
+            <div className="mb-5 p-3 rounded-full bg-gray-50 text-gray-900 group-hover:bg-red-600 group-hover:text-white transition-colors duration-300">
+              {React.cloneElement(policy.icon, { size: 28 })}
+            </div>
+            <h3 className="text-xl font-bold mb-3 group-hover:text-red-600 transition-colors">
               {policy.title}
             </h3>
-            <p className="text-gray-600 text-sm md:text-base leading-relaxed">
+            <p className="text-gray-500 leading-relaxed text-sm md:text-base">
               {policy.description}
             </p>
           </Motion.motion.div>
         ))}
       </Motion.motion.div>
 
-      {/* Footer note */}
-      <Motion.motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="mt-16 text-center max-w-3xl mx-auto text-gray-700 text-base md:text-lg leading-relaxed"
-      >
-        <p>
-          Lưu ý: Quyền lợi thành viên áp dụng dựa trên chính sách và điều kiện
-          hiện hành của ShopClothes. ShopClothes có quyền cập nhật và điều chỉnh
-          quyền lợi mà không cần thông báo trước. Hãy đăng nhập để theo dõi điểm
-          thưởng và trạng thái thành viên của bạn.
+      {/* Footer Note */}
+      <div className="max-w-2xl mx-auto mt-20 text-center border-t border-gray-100 pt-8">
+        <p className="text-gray-400 text-sm">
+          * Chính sách có thể thay đổi tùy theo từng thời điểm. Vui lòng đăng
+          nhập để kiểm tra hạng thành viên của bạn.
         </p>
-      </Motion.motion.div>
+      </div>
     </div>
   );
 }

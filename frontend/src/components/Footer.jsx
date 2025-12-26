@@ -1,110 +1,172 @@
-// Footer.jsx
+// src/components/Footer.jsx
 import React from "react";
-import bocongthuong from "../assets/bocongthuong.png";
-import pttt from "../assets/pttt.jpg";
+import { Link } from "react-router-dom";
+import {
+  Facebook,
+  Instagram,
+  Youtube,
+  Twitter,
+  MapPin,
+  Phone,
+  Mail,
+  ArrowRight,
+} from "lucide-react";
 
 const supportLinks = [
   { name: "Hướng dẫn mua hàng", href: "/user-guide-pro" },
   { name: "Chính sách đổi trả & bảo hành", href: "/warrant-policy" },
   { name: "Hệ thống cửa hàng", href: "/store-system" },
-  { name: "Quy trình giao nhận và thanh toán", href: "/user-guide-pro" },
+  { name: "Quy trình giao nhận", href: "/user-guide-pro" },
   { name: "Chính sách thành viên", href: "/member-policy" },
 ];
 
 const policyLinks = [
   { name: "Tìm kiếm", href: "/" },
-  { name: "Giới thiệu", href: "/about" },
-  { name: "Sản phẩm của cửa hàng", href: "/products" },
+  { name: "Giới thiệu về ShopClothes", href: "/about" },
+  { name: "Sản phẩm mới", href: "/products" },
+  { name: "Tuyển dụng", href: "#" },
+  { name: "Liên hệ", href: "/contact" },
 ];
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-gray-300 mt-10">
-      {/* Container chính */}
-      <div className="max-w-7xl mx-auto py-12 px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-          {/* Cột 1: Về chúng tôi */}
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-4">
-              Về chúng tôi
-            </h3>
-            <div className="text-2xl font-extrabold text-white mb-4">
-              <span className="tracking-widest">SHOPCLOTHES</span>
-            </div>
-            <p className="text-sm leading-relaxed text-gray-400">
-              Thương hiệu thời trang SHOPCLOTHES phát triển mạnh với dòng áo
-              khoác và áo phông hình in, đặc biệt chú trọng đến{" "}
-              <span className="font-semibold text-white">chất lượng</span> và{" "}
-              <span className="font-semibold text-white">
-                quy trình sản xuất an toàn
-              </span>
-              .
+    <footer className="bg-black text-white pt-20 pb-10 border-t border-gray-900 font-sans">
+      <div className="max-w-screen-xl mx-auto px-6 lg:px-8">
+        {/* TOP SECTION: 4 CỘT */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-16">
+          {/* CỘT 1: THƯƠNG HIỆU & LIÊN HỆ */}
+          <div className="space-y-6">
+            <h2 className="text-2xl font-black uppercase tracking-tighter text-white">
+              Shop<span className="text-red-600">Clothes</span>
+            </h2>
+            <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
+              Thương hiệu thời trang tối giản, chú trọng vào chất liệu bền vững
+              và trải nghiệm khách hàng cao cấp.
             </p>
+            <div className="space-y-3 text-sm text-gray-400">
+              <div className="flex items-start gap-3">
+                <MapPin size={18} className="shrink-0 text-white mt-0.5" />
+                <span>112 Hồ Văn Huê, Phú Nhuận, TP.HCM</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Phone size={18} className="shrink-0 text-white" />
+                <span className="font-bold text-white">0862 347 170</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Mail size={18} className="shrink-0 text-white" />
+                <span>support@shopclothes.vn</span>
+              </div>
+            </div>
           </div>
 
-          {/* Cột 2: Chính sách */}
+          {/* CỘT 2: VỀ CHÚNG TÔI */}
           <div>
-            <h3 className="text-lg font-semibold text-white mb-4">
-              Chính sách
+            <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-6">
+              Về Chúng Tôi
             </h3>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-4">
               {policyLinks.map((link) => (
                 <li key={link.name}>
-                  <a
-                    href={link.href}
-                    className="hover:text-white transition-colors duration-200"
+                  <Link
+                    to={link.href}
+                    className="text-sm text-gray-400 hover:text-white hover:translate-x-1 transition-all duration-300 flex items-center gap-2"
                   >
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Cột 3: Hỗ trợ khách hàng */}
+          {/* CỘT 3: HỖ TRỢ KHÁCH HÀNG */}
           <div>
-            <h3 className="text-lg font-semibold text-white mb-4">
-              Hỗ trợ khách hàng
+            <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-6">
+              Hỗ Trợ Khách Hàng
             </h3>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-4">
               {supportLinks.map((link) => (
                 <li key={link.name}>
-                  <a
-                    href={link.href}
-                    className="hover:text-white transition-colors duration-200"
+                  <Link
+                    to={link.href}
+                    className="text-sm text-gray-400 hover:text-white hover:translate-x-1 transition-all duration-300 block"
                   >
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Cột 4: Thanh toán + Bộ Công Thương */}
+          {/* CỘT 4: KẾT NỐI & CHỨNG NHẬN */}
           <div>
-            <h3 className="text-lg font-semibold text-white mb-4">
-              Phương thức thanh toán
+            <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-6">
+              Kết nối với chúng tôi
             </h3>
-            <div className="flex space-x-3 mb-6">
-              <img
-                src={pttt}
-                alt="MoMo"
-                className="h-10 w-auto rounded-md shadow-md"
-              />
+
+            {/* Social Icons */}
+            <div className="flex gap-4 mb-8">
+              <a
+                href="#"
+                className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300"
+              >
+                <Facebook size={18} />
+              </a>
+              <a
+                href="#"
+                className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300"
+              >
+                <Instagram size={18} />
+              </a>
+              <a
+                href="#"
+                className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300"
+              >
+                <Youtube size={18} />
+              </a>
+              <a
+                href="#"
+                className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300"
+              >
+                <Twitter size={18} />
+              </a>
             </div>
-            <div>
+
+            <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">
+              Chứng nhận & Thanh toán
+            </h3>
+            <div className="flex flex-col gap-4">
+              {/* Hình ảnh thanh toán */}
+              <div className="bg-white p-2 rounded w-fit">
+                <img
+                  src="https://res.cloudinary.com/dhbz4atrb/image/upload/v1766756998/myclothes/ynqg3zv3mq1gwmakrppp.png"
+                  alt="Payment Methods"
+                  className="h-8 object-contain"
+                />
+              </div>
+              {/* Hình ảnh Bộ Công Thương */}
               <img
-                src={bocongthuong}
-                alt="Đã thông báo Bộ Công Thương"
-                className="h-16 w-auto"
+                src="https://res.cloudinary.com/dhbz4atrb/image/upload/v1766756999/myclothes/n5onm2oq7if24iseovkp.png"
+                alt="Bo Cong Thuong"
+                className="h-10 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
               />
             </div>
           </div>
         </div>
 
-        {/* Copyright */}
-        <div className="border-t border-gray-700 mt-10 pt-6 text-center text-sm text-gray-500">
-          © {new Date().getFullYear()} SHOPCLOTHES | Cung cấp bởi Haravan
+        {/* BOTTOM BAR */}
+        <div className="border-t border-gray-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-600">
+          <p>© {new Date().getFullYear()} SHOPCLOTHES. All rights reserved.</p>
+          <div className="flex gap-6">
+            <a href="#" className="hover:text-gray-400">
+              Privacy Policy
+            </a>
+            <a href="#" className="hover:text-gray-400">
+              Terms of Service
+            </a>
+            <a href="#" className="hover:text-gray-400">
+              Cookie Policy
+            </a>
+          </div>
         </div>
       </div>
     </footer>

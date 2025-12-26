@@ -124,26 +124,76 @@ const applyDiscountsForCheckout = (products, discounts) => {
 
 /* ---------------------- API CHÍNH ---------------------- */
 
-// ✅ Lấy tất cả sản phẩm của category (bao gồm con cháu)
+// backend/controllers/productController.js (hoặc file tương ứng)
+
 export const getProductsByCategoryTree = async (req, res) => {
   try {
     const { id } = req.params;
+    // 1. Lấy tham số từ Query String (Frontend gửi lên)
+    const { minPrice, maxPrice, color, sort, page = 1, limit = 12 } = req.query;
+
+    // 2. Logic lấy Category con (GIỮ NGUYÊN)
     const allCategoryIds = await getAllChildCategoryIds(id);
     allCategoryIds.push(id);
 
-    const products = await Product.find({ categoryId: { $in: allCategoryIds } })
-      .populate("categoryId")
-      .sort({ createdAt: -1 });
+    // 3. Xây dựng bộ lọc (Query Object) cho MongoDB
+    let query = { categoryId: { $in: allCategoryIds } };
 
+    // -- Lọc theo Giá (Base Price)
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = Number(minPrice);
+      if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    // -- Lọc theo Màu (Tìm trong mảng variants)
+    if (color && color !== "undefined") {
+      query["variants.color"] = color;
+    }
+
+    // 4. Xử lý Sắp xếp (Sort)
+    let sortOption = { createdAt: -1 }; // Mặc định: Mới nhất
+    if (sort === "price_asc") sortOption = { price: 1 }; // Giá tăng dần
+    if (sort === "price_desc") sortOption = { price: -1 }; // Giá giảm dần
+    if (sort === "oldest") sortOption = { createdAt: 1 }; // Cũ nhất
+
+    // 5. Tính toán phân trang (Pagination)
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    // 6. Thực hiện Query (Đếm tổng + Lấy data)
+    // Đếm tổng số sản phẩm thỏa mãn bộ lọc (để tính totalPages)
+    const totalProducts = await Product.countDocuments(query);
+
+    // Lấy sản phẩm theo trang
+    const products = await Product.find(query)
+      .populate("categoryId")
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limitNumber);
+
+    // 7. Logic Giảm giá (GIỮ NGUYÊN)
+    // Lưu ý: Logic này tính giảm giá sau khi đã lọc sản phẩm từ DB
     const activeDiscounts = await Discount.find({
       isActive: true,
       startDate: { $lte: new Date() },
       $or: [{ endDate: { $exists: false } }, { endDate: { $gte: new Date() } }],
     });
 
-    const updated = applyDiscountsForHome(products, activeDiscounts);
-    res.json({ data: updated, count: updated.length });
+    const updatedProducts = applyDiscountsForHome(products, activeDiscounts);
+
+    // 8. Trả về Response chuẩn Format cho Frontend phân trang
+    res.json({
+      success: true,
+      data: updatedProducts, // Danh sách sản phẩm (đã có discount)
+      totalProducts, // Tổng số lượng tìm thấy
+      totalPages: Math.ceil(totalProducts / limitNumber), // Tổng số trang
+      currentPage: pageNumber, // Trang hiện tại
+      count: updatedProducts.length, // Số lượng trả về trong request này
+    });
   } catch (err) {
+    console.error("Lỗi getProductsByCategoryTree:", err);
     res.status(500).json({ error: err.message });
   }
 };

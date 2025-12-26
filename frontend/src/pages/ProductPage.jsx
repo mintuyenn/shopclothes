@@ -1,169 +1,352 @@
-// src/pages/ProductPage.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
-import * as Motion from "framer-motion";
+import { Filter, X, SlidersHorizontal, ChevronDown } from "lucide-react";
 import ProductCard from "../components/ProductCard";
-import FilterBar from "../components/FilterBar";
-import { ShoppingCart } from "lucide-react";
 
 const ProductPage = () => {
-  const [products, setProducts] = useState([]);
-  const [loadingAll, setLoadingAll] = useState(true);
-  const [colors, setColors] = useState([]);
-  const [selectedPrice, setSelectedPrice] = useState("Tất cả");
-  const [selectedColor, setSelectedColor] = useState("Tất cả");
-  const [toast, setToast] = useState(null);
-
+  // --- URL Params ---
   const [searchParams, setSearchParams] = useSearchParams();
   const minPrice = searchParams.get("minPrice") || "";
   const maxPrice = searchParams.get("maxPrice") || "";
   const color = searchParams.get("color") || "";
-  const sort = searchParams.get("sort") || "";
+  const sort = searchParams.get("sort") || "newest";
+  const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
-  const priceRanges = [
-    { label: "Dưới 100.000đ", min: 0, max: 100000 },
-    { label: "Từ 100.000 - 200.000đ", min: 100000, max: 200000 },
-    { label: "Từ 200.000 - 300.000đ", min: 200000, max: 300000 },
-    { label: "Trên 300.000đ", min: 300000, max: "" },
-  ];
+  // --- State ---
+  const [products, setProducts] = useState([]);
+  const [availableColors, setAvailableColors] = useState([]); // Danh sách màu lấy từ API
+  const [loading, setLoading] = useState(true);
+  const [showMobileFilter, setShowMobileFilter] = useState(false);
 
-  const showToast = (text, type = "success") => {
-    setToast({ text, type });
-    setTimeout(() => setToast(null), 2000);
+  // Local state cho input giá (để nhập xong mới bấm Áp dụng)
+  const [priceRange, setPriceRange] = useState({
+    min: minPrice,
+    max: maxPrice,
+  });
+
+  // --- Helpers ---
+  const updateQuery = (newParams) => {
+    const currentParams = Object.fromEntries(searchParams.entries());
+    const mergedParams = { ...currentParams, ...newParams };
+
+    // Xóa key rỗng
+    Object.keys(mergedParams).forEach((key) => {
+      if (!mergedParams[key]) delete mergedParams[key];
+    });
+
+    setSearchParams(mergedParams);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const fetchProducts = async () => {
-    setLoadingAll(true);
-    try {
-      const res = await axios.get("http://localhost:5001/api/products", {
-        params: { limit: 9999, minPrice, maxPrice, color, sort },
-      });
-      const data = res.data.data || [];
-      setProducts(data);
-
-      const allColors = new Set();
-      data.forEach((p) => p.variants?.forEach((v) => allColors.add(v.color)));
-      setColors([...allColors]);
-    } catch (err) {
-      console.error("Lỗi tải sản phẩm:", err);
-      setProducts([]);
-    } finally {
-      setLoadingAll(false);
-    }
+  const handleApplyPrice = () => {
+    updateQuery({ minPrice: priceRange.min, maxPrice: priceRange.max });
+    setShowMobileFilter(false);
   };
 
+  const clearAllFilters = () => {
+    setPriceRange({ min: "", max: "" });
+    setSearchParams({}); // Xóa hết params
+  };
+
+  // --- Fetch Data ---
   useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        // Fetch products với filter hiện tại
+        const res = await axios.get(`${API_URL}/products`, {
+          params: { limit: 100, minPrice, maxPrice, color, sort },
+        });
+        const data = res.data.data || [];
+        setProducts(data);
+
+        // Logic: Lấy toàn bộ màu sắc có sẵn từ danh sách sản phẩm tải về
+        // (Hoặc tốt hơn là gọi 1 API riêng lấy list colors nếu backend hỗ trợ)
+        const colorsSet = new Set();
+        data.forEach((p) => p.variants?.forEach((v) => colorsSet.add(v.color)));
+        setAvailableColors(Array.from(colorsSet).sort());
+      } catch (err) {
+        console.error("Lỗi tải sản phẩm:", err);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchProducts();
+    // Sync lại input giá khi URL thay đổi (trường hợp user back/forward browser)
+    setPriceRange({ min: minPrice, max: maxPrice });
   }, [minPrice, maxPrice, color, sort]);
 
-  const updateQuery = (params, labelSetter, labelValue) => {
-    const newParams = { minPrice, maxPrice, color, sort, ...params };
-    Object.keys(newParams).forEach(
-      (key) =>
-        (newParams[key] === "" || newParams[key] === undefined) &&
-        delete newParams[key]
-    );
-    setSearchParams(newParams);
-    if (labelSetter) labelSetter(labelValue);
-  };
+  // --- Component con: Sidebar Content (Tái sử dụng cho cả Desktop & Mobile) ---
+  const FilterContent = () => (
+    <div className="space-y-8">
+      {/* 1. Sort */}
+      <div>
+        <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-900">
+          Sắp xếp
+        </h3>
+        <div className="space-y-3">
+          {[
+            { label: "Mới nhất", value: "newest" },
+            { label: "Giá tăng dần", value: "price_asc" },
+            { label: "Giá giảm dần", value: "price_desc" },
+          ].map((opt) => (
+            <label
+              key={opt.value}
+              className="flex items-center gap-3 cursor-pointer group"
+            >
+              <div
+                className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                  sort === opt.value ? "border-red-600" : "border-gray-300"
+                }`}
+              >
+                {sort === opt.value && (
+                  <div className="w-2 h-2 bg-red-600 rounded-full" />
+                )}
+              </div>
+              <input
+                type="radio"
+                name="sort"
+                className="hidden"
+                checked={sort === opt.value}
+                onChange={() => updateQuery({ sort: opt.value })}
+              />
+              <span
+                className={`text-sm ${
+                  sort === opt.value
+                    ? "font-bold text-gray-900"
+                    : "text-gray-600 group-hover:text-black"
+                }`}
+              >
+                {opt.label}
+              </span>
+            </label>
+          ))}
+        </div>
+      </div>
 
-  // --- Motion Variants ---
-  const containerVariants = {
-    hidden: {},
-    visible: { transition: { staggerChildren: 0.1 } },
-  };
+      <hr className="border-gray-100" />
 
-  const cardVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: "easeOut" },
-    },
-    hover: { scale: 1.03, boxShadow: "0px 20px 40px rgba(0,0,0,0.15)" },
-  };
+      {/* 2. Price Range */}
+      <div>
+        <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-900">
+          Khoảng giá
+        </h3>
+        <div className="flex items-center gap-2 mb-3">
+          <input
+            type="number"
+            placeholder="Min"
+            value={priceRange.min}
+            onChange={(e) =>
+              setPriceRange({ ...priceRange, min: e.target.value })
+            }
+            className="w-full p-2 text-sm border border-gray-200 outline-none focus:border-black transition-colors"
+          />
+          <span className="text-gray-400">-</span>
+          <input
+            type="number"
+            placeholder="Max"
+            value={priceRange.max}
+            onChange={(e) =>
+              setPriceRange({ ...priceRange, max: e.target.value })
+            }
+            className="w-full p-2 text-sm border border-gray-200 outline-none focus:border-black transition-colors"
+          />
+        </div>
+        <button
+          onClick={handleApplyPrice}
+          className="w-full py-2 bg-black text-white text-xs font-bold uppercase hover:bg-red-600 transition-colors"
+        >
+          Áp dụng
+        </button>
+      </div>
+
+      <hr className="border-gray-100" />
+
+      {/* 3. Colors */}
+      <div>
+        <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-900">
+          Màu sắc
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => updateQuery({ color: "" })}
+            className={`px-3 py-1 text-xs border transition-all ${
+              color === ""
+                ? "bg-black text-white border-black"
+                : "bg-white text-gray-600 border-gray-200 hover:border-black"
+            }`}
+          >
+            Tất cả
+          </button>
+          {availableColors.map((c) => (
+            <button
+              key={c}
+              onClick={() => updateQuery({ color: c })}
+              className={`px-3 py-1 text-xs border transition-all uppercase ${
+                color === c
+                  ? "bg-black text-white border-black"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-black"
+              }`}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Nút xóa lọc */}
+      {(minPrice || maxPrice || color || sort !== "newest") && (
+        <button
+          onClick={clearAllFilters}
+          className="text-xs text-red-500 font-medium underline mt-4 hover:text-red-700"
+        >
+          Xóa tất cả bộ lọc
+        </button>
+      )}
+    </div>
+  );
 
   return (
-    <div className="pt-20 bg-yellow-50 min-h-screen">
-      {/* Toast */}
-      {toast && (
-        <div
-          className="fixed top-5 right-5 px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 z-50 animate-slide transition-opacity duration-500"
-          style={{
-            backgroundColor: toast.type === "success" ? "#1abc9c" : "#e74c3c",
-          }}
-        >
-          <ShoppingCart size={18} color="#fff" />
-          <span className="text-sm font-medium text-white">{toast.text}</span>
-        </div>
-      )}
+    <div className="min-h-screen bg-white font-sans text-gray-900 pt-10 pb-20">
+      {/* HEADER */}
+      <div className="text-center mb-12 px-4">
+        <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-4">
+          Tất cả sản phẩm
+        </h1>
+        <p className="text-gray-500 max-w-xl mx-auto text-sm md:text-base">
+          Khám phá bộ sưu tập mới nhất với thiết kế tối giản và chất liệu cao
+          cấp.
+        </p>
+      </div>
 
-      <div className="px-6 md:px-12 mt-10">
-        {/* Header */}
-        <Motion.motion.div
-          initial={{ opacity: 0, y: -40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-8"
-        >
-          <h2 className="text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-pink-700 mb-2 animate-pulse">
-            GIAN HÀNG SẢN PHẨM
-          </h2>
-          <p className="text-blue-600 text-lg md:text-xl font-semibold max-w-xl mx-auto">
-            Mua ngay hôm nay để nhận nhiều ưu đãi hấp dẫn! 🎁
-          </p>
-        </Motion.motion.div>
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="flex flex-col lg:flex-row gap-10">
+          {/* === SIDEBAR (DESKTOP) === */}
+          <aside className="hidden lg:block w-1/4 sticky top-24 h-fit">
+            <FilterContent />
+          </aside>
 
-        {/* FilterBar */}
-        <FilterBar
-          selectedPrice={selectedPrice}
-          setSelectedPrice={setSelectedPrice}
-          selectedColor={selectedColor}
-          setSelectedColor={setSelectedColor}
-          sort={sort}
-          updateQuery={updateQuery}
-          colors={colors}
-          priceRanges={priceRanges}
-        />
-
-        {/* Products Grid */}
-        {loadingAll ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 animate-pulse mt-6">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="bg-gray-200 h-64 rounded-lg"></div>
-            ))}
-          </div>
-        ) : products.length === 0 ? (
-          <div className="text-center text-gray-500 mt-10">
-            Không có sản phẩm.
-          </div>
-        ) : (
-          <Motion.motion.div
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-6"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
+          {/* === MOBILE FILTER DRAWER === */}
+          <div
+            className={`fixed inset-0 z-50 transform ${
+              showMobileFilter ? "translate-x-0" : "-translate-x-full"
+            } transition-transform duration-300 lg:hidden`}
           >
-            {products.map((p) => {
-              const activeVariant =
-                p.variants?.find((v) => v.color === color) || p.variants?.[0];
-              return (
-                <Motion.motion.div
-                  key={p._id}
-                  variants={cardVariants}
-                  whileHover="hover"
+            <div
+              className="absolute inset-0 bg-black/50"
+              onClick={() => setShowMobileFilter(false)}
+            ></div>
+            <div className="absolute left-0 top-0 bottom-0 w-4/5 max-w-xs bg-white p-6 overflow-y-auto shadow-2xl">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-bold uppercase">Bộ lọc</h2>
+                <button onClick={() => setShowMobileFilter(false)}>
+                  <X size={24} />
+                </button>
+              </div>
+              <FilterContent />
+            </div>
+          </div>
+
+          {/* === MAIN CONTENT === */}
+          <main className="lg:w-3/4 w-full">
+            {/* Mobile Filter Trigger Button */}
+            <div className="lg:hidden mb-6 flex justify-between items-center border border-gray-200 p-3 rounded">
+              <span className="text-sm font-bold">
+                {products.length} Sản phẩm
+              </span>
+              <button
+                onClick={() => setShowMobileFilter(true)}
+                className="flex items-center gap-2 text-sm font-medium text-gray-700"
+              >
+                <Filter size={18} /> Bộ lọc & Sắp xếp
+              </button>
+            </div>
+
+            {/* Tags đang lọc (Hiển thị nhanh) */}
+            {(color || minPrice || maxPrice) && (
+              <div className="flex flex-wrap gap-2 mb-6 text-sm">
+                {color && (
+                  <span className="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-1">
+                    Màu: {color}{" "}
+                    <X
+                      size={14}
+                      className="cursor-pointer"
+                      onClick={() => updateQuery({ color: "" })}
+                    />
+                  </span>
+                )}
+                {(minPrice || maxPrice) && (
+                  <span className="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-1">
+                    Giá: {minPrice || 0} - {maxPrice || "..."}{" "}
+                    <X
+                      size={14}
+                      className="cursor-pointer"
+                      onClick={() =>
+                        updateQuery({ minPrice: "", maxPrice: "" })
+                      }
+                    />
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Loading State */}
+            {loading ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="animate-pulse">
+                    <div className="bg-gray-100 aspect-[3/4] w-full mb-3"></div>
+                    <div className="bg-gray-100 h-4 w-3/4 mb-2"></div>
+                    <div className="bg-gray-100 h-4 w-1/2"></div>
+                  </div>
+                ))}
+              </div>
+            ) : products.length === 0 ? (
+              /* Empty State */
+              <div className="text-center py-20 bg-gray-50 rounded-lg">
+                <SlidersHorizontal className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-gray-900">
+                  Không tìm thấy sản phẩm
+                </h3>
+                <p className="text-gray-500 mb-6">
+                  Thử thay đổi bộ lọc hoặc xem tất cả sản phẩm.
+                </p>
+                <button
+                  onClick={clearAllFilters}
+                  className="px-6 py-2 bg-black text-white text-sm font-bold uppercase hover:bg-gray-800"
                 >
-                  <ProductCard
-                    product={p}
-                    activeVariant={activeVariant}
-                    showToast={showToast}
-                  />
-                </Motion.motion.div>
-              );
-            })}
-          </Motion.motion.div>
-        )}
+                  Xóa bộ lọc
+                </button>
+              </div>
+            ) : (
+              /* Product Grid */
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-10">
+                {products.map((product) => {
+                  // Xác định variant đang active dựa trên filter màu
+                  // Nếu user lọc màu 'Red', ta truyền variant màu Red vào ProductCard để nó hiển thị ảnh đỏ
+                  const activeVariant = color
+                    ? product.variants?.find((v) => v.color === color)
+                    : null;
+
+                  return (
+                    <div
+                      key={product._id}
+                      className="transition-transform duration-300 hover:-translate-y-1"
+                    >
+                      <ProductCard
+                        product={product}
+                        activeVariant={activeVariant}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </main>
+        </div>
       </div>
     </div>
   );

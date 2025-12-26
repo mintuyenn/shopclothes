@@ -1,114 +1,118 @@
 import React from "react";
+import { ShieldCheck, Clock, AlertCircle } from "lucide-react";
 
-// Đây là component chính của ứng dụng
 export default function WarrantyPolicyPage() {
   return (
-    <div className="flex items-center justify-center min-h-screen p-4 bg-gray-100 sm:p-8 font-['Inter',_sans-serif]">
-      {/* Container chính cho nội dung
-        - max-w-3xl: Giới hạn chiều rộng tối đa
-        - bg-white: Nền trắng
-        - shadow-lg: Đổ bóng lớn
-        - rounded-xl: Bo góc lớn
-        - overflow-hidden: Ẩn nội dung tràn viền (quan trọng khi dùng border-l)
-      */}
-      <div className="w-full max-w-3xl overflow-hidden bg-white shadow-lg rounded-xl">
-        {/* Phần viền đen bên trái
-          - border-l-8: Tạo viền trái dày 8px
-          - border-black: Màu viền đen
-          - p-8 sm:p-12: Padding cho nội dung bên trong
-        */}
-        <div className="p-8 border-l-8 border-black sm:p-12">
-          {/* Tiêu đề chính */}
-          <h1 className="mb-8 text-4xl font-bold text-center text-gray-900 sm:text-5xl">
+    <div className="min-h-screen bg-white pt-[120px] pb-20 px-4 md:px-8 font-sans text-gray-900">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="border-b border-gray-100 pb-8 mb-10 text-center md:text-left">
+          <h1 className="text-3xl md:text-5xl font-bold uppercase tracking-tight mb-4">
             Chính sách bảo hành
           </h1>
-
-          {/* Đoạn giới thiệu */}
-          <p className="mb-8 text-base text-gray-700">
-            Chính sách bảo hành được áp dụng cho các sản phẩm chính hãng của
-            ShopClothes mà không yêu cầu hóa đơn.
+          <p className="text-gray-500">
+            Cam kết chất lượng và dịch vụ hậu mãi trọn đời từ ShopClothes.
           </p>
+        </div>
 
-          {/* Phần: Thời gian và địa điểm */}
-          <section className="mb-8">
-            <h2 className="mb-4 text-2xl font-bold text-gray-900">
-              Thời gian và địa điểm:
-            </h2>
-            <ul className="pl-5 text-gray-700 list-disc list-outside space-y-3">
-              <li className="pl-2">
-                <strong className="font-semibold text-gray-800">
-                  Thời gian xử lý:
-                </strong>{" "}
-                Tối đa 14 ngày làm việc. Nhân viên sẽ liên hệ nếu hoàn thành
-                sớm.
-              </li>
-              <li className="pl-2">
-                <strong className="font-semibold text-gray-800">
-                  Địa điểm:
-                </strong>
-                {/* Các địa điểm con */}
-                <p className="mt-2 text-gray-600">
-                  - Tại bất kỳ chi nhánh ShopClothes nào trên toàn quốc.
-                </p>
-                <p className="mt-2 text-gray-600">
-                  - Hoặc gửi hàng về địa chỉ: 112 Đức Nhuận HCM+ SĐT: 0862347170
-                </p>
-              </li>
-              <li className="pl-2">
-                <strong className="font-semibold text-gray-800">
-                  Giờ nhận bảo hành:
-                </strong>{" "}
-                8h30 - 21h45.
-              </li>
-            </ul>
+        {/* Content Blocks */}
+        <div className="space-y-12">
+          {/* Section 1 */}
+          <section className="grid md:grid-cols-12 gap-6">
+            <div className="md:col-span-4">
+              <div className="flex items-center gap-3 text-red-600 mb-2">
+                <Clock className="w-6 h-6" />
+                <h2 className="text-xl font-bold uppercase tracking-wide">
+                  Thời gian & Địa điểm
+                </h2>
+              </div>
+            </div>
+            <div className="md:col-span-8 text-gray-600 space-y-4 leading-relaxed">
+              <p>
+                <strong className="text-gray-900">Thời gian xử lý:</strong> Tối
+                đa 14 ngày làm việc. Chúng tôi sẽ ưu tiên xử lý sớm nhất có thể
+                và thông báo qua SMS/Email.
+              </p>
+              <div>
+                <strong className="text-gray-900">Địa điểm tiếp nhận:</strong>
+                <ul className="list-disc pl-5 mt-2 space-y-1">
+                  <li>Tất cả chi nhánh ShopClothes trên toàn quốc.</li>
+                  <li>
+                    Gửi chuyển phát về:{" "}
+                    <strong>112 Hồ Văn Huê, Phú Nhuận, TP.HCM</strong> (Hotline:
+                    0862347170).
+                  </li>
+                </ul>
+              </div>
+              <p>
+                <strong className="text-gray-900">Khung giờ:</strong> 8:30 -
+                21:00 (Tất cả các ngày trong tuần).
+              </p>
+            </div>
           </section>
 
-          {/* Phần: Nội dung bảo hành */}
-          <section className="mb-8">
-            <h2 className="mb-4 text-2xl font-bold text-gray-900">
-              Nội dung bảo hành:
-            </h2>
-            <ul className="pl-5 text-gray-700 list-disc list-outside space-y-3">
-              <li className="pl-2">
-                <strong className="font-semibold text-gray-800">
-                  Chỉnh sửa sản phẩm theo yêu cầu:
-                </strong>{" "}
-                Lên lai, bóp eo.
-              </li>
-              <li className="pl-2">
-                <strong className="font-semibold text-gray-800">
-                  Sửa lỗi kỹ thuật sản xuất:
-                </strong>{" "}
-                Bung chỉ, bung keo, hư dây kéo, đứt nút.
-              </li>
-            </ul>
+          <div className="border-t border-gray-100"></div>
+
+          {/* Section 2 */}
+          <section className="grid md:grid-cols-12 gap-6">
+            <div className="md:col-span-4">
+              <div className="flex items-center gap-3 text-red-600 mb-2">
+                <ShieldCheck className="w-6 h-6" />
+                <h2 className="text-xl font-bold uppercase tracking-wide">
+                  Phạm vi bảo hành
+                </h2>
+              </div>
+            </div>
+            <div className="md:col-span-8 text-gray-600 space-y-4 leading-relaxed">
+              <p>
+                Áp dụng cho toàn bộ sản phẩm chính hãng mà không cần giữ hóa đơn
+                giấy (tra cứu qua SĐT).
+              </p>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>
+                  <strong className="text-gray-900">Sửa chữa miễn phí:</strong>{" "}
+                  Cắt gấu, lên lai, bóp eo, nới rộng (nếu còn vải dư).
+                </li>
+                <li>
+                  <strong className="text-gray-900">Lỗi kỹ thuật:</strong> Bung
+                  chỉ, hư dây kéo, đứt cúc, bung keo đế giày.
+                </li>
+                <li>
+                  <strong className="text-gray-900">Thay thế phụ kiện:</strong>{" "}
+                  Thay khóa kéo, đóng nút mới (sử dụng phụ kiện nguyên bản hoặc
+                  tương đương).
+                </li>
+              </ul>
+            </div>
           </section>
 
-          {/* Phần: Lưu ý quan trọng */}
-          <section>
-            <h2 className="mb-4 text-2xl font-bold text-gray-900">
-              Lưu ý quan trọng:
-            </h2>
-            <ul className="pl-5 text-gray-700 list-disc list-outside space-y-3">
-              <li className="pl-2">
-                Các sản phẩm không hỗ trợ bảo hành bao gồm: Nước hoa, khẩu
-                trang, quần lót, vớ.
-              </li>
-              <li className="pl-2">
-                Trong 30 ngày đầu tiên, nếu lỗi được xác nhận do ShopClothes,
-                khách hàng sẽ được đổi sản phẩm mới.
-              </li>
-              <li className="pl-2">
-                Nếu phụ kiện (như nút, dây kéo) cần thay thế không còn,
-                ShopClothes sẽ sử dụng phụ kiện tương đương và thông báo trước
-                cho khách hàng.
-              </li>
-              <li className="pl-2">
-                ShopClothes có thể từ chối bảo hành đối với các trường hợp sản
-                phẩm hư hỏng do quá trình sử dụng lâu dài hoặc hao mòn tự nhiên
-                mà không thể sửa chữa.
-              </li>
-            </ul>
+          <div className="border-t border-gray-100"></div>
+
+          {/* Section 3 */}
+          <section className="grid md:grid-cols-12 gap-6 bg-gray-50 p-6 rounded-xl">
+            <div className="md:col-span-4">
+              <div className="flex items-center gap-3 text-gray-900 mb-2">
+                <AlertCircle className="w-6 h-6" />
+                <h2 className="text-xl font-bold uppercase tracking-wide">
+                  Lưu ý quan trọng
+                </h2>
+              </div>
+            </div>
+            <div className="md:col-span-8 text-gray-600 space-y-3 text-sm">
+              <p>
+                • Sản phẩm <strong>không áp dụng</strong> bảo hành: Đồ lót, tất
+                (vớ), nước hoa, phụ kiện trang sức.
+              </p>
+              <p>
+                • Trong vòng <strong>30 ngày đầu</strong>, nếu sản phẩm có lỗi
+                từ nhà sản xuất, quý khách được đổi mới 1-1 ngay lập tức.
+              </p>
+              <p>
+                • Chúng tôi có quyền từ chối bảo hành đối với các sản phẩm hư
+                hỏng nặng do tác động vật lý, hóa chất hoặc hao mòn tự nhiên quá
+                mức.
+              </p>
+            </div>
           </section>
         </div>
       </div>

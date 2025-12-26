@@ -68,29 +68,6 @@ export const logout = (req, res) => {
   res.status(200).json({ message: "Người dùng đã đăng xuất thành công" });
 };
 
-export const refreshToken = (req, res) => {
-  const { token } = req.body;
-  if (!token) return res.status(400).json({ message: "Không có token" });
-
-  try {
-    // Kiểm tra token cũ
-    const decoded = jwt.verify(token, process.env.JWT_SECRET, {
-      ignoreExpiration: true,
-    });
-
-    // Tạo token mới
-    const newToken = jwt.sign(
-      { id: decoded.id, role: decoded.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    res.status(200).json({ token: newToken });
-  } catch (error) {
-    res.status(401).json({ message: "Token không hợp lệ" });
-  }
-};
-
 export const changePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
 
@@ -157,5 +134,27 @@ export const deleteAccount = async (req, res) => {
   } catch (err) {
     console.error("Delete account error:", err);
     res.status(500).json({ message: err.message });
+  }
+};
+export const refreshToken = (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.status(400).json({ message: "Không có token" });
+
+  try {
+    // Kiểm tra token cũ
+    const decoded = jwt.verify(token, process.env.JWT_SECRET, {
+      ignoreExpiration: true,
+    });
+
+    // Tạo token mới
+    const newToken = jwt.sign(
+      { id: decoded.id, role: decoded.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({ token: newToken });
+  } catch (error) {
+    res.status(401).json({ message: "Token không hợp lệ" });
   }
 };

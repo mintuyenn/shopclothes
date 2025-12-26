@@ -1,5 +1,12 @@
+// src/components/ProductCard.jsx
 import React, { useState, useEffect } from "react";
-import { ShoppingCart, CheckCircle, AlertCircle, Star } from "lucide-react";
+import {
+  ShoppingCart,
+  CheckCircle,
+  AlertCircle,
+  Star,
+  Eye,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
@@ -18,7 +25,7 @@ const ProductCard = ({ product, activeVariant = null }) => {
       "/placeholder.png"
   );
 
-  const [toast, setToast] = useState(null); // ✅ Toast state
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     if (activeVariant) {
@@ -45,202 +52,180 @@ const ProductCard = ({ product, activeVariant = null }) => {
 
   return (
     <>
-      {/* ✅ Toast Shopee style */}
+      {/* --- TOAST NOTIFICATION (Minimal Style) --- */}
       {toast && (
         <div
-          className={`fixed top-5 right-5 px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-white z-50
-          animate-slide`}
+          className={`fixed top-24 right-5 px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 z-[9999] animate-fade-in-down border-l-4 backdrop-blur-md bg-white/95`}
           style={{
-            backgroundColor: toast.type === "success" ? "#1abc9c" : "#e74c3c",
+            borderColor: toast.type === "success" ? "#10b981" : "#ef4444",
           }}
         >
           {toast.type === "success" ? (
-            <CheckCircle size={18} />
+            <CheckCircle size={20} className="text-green-500" />
           ) : (
-            <AlertCircle size={18} />
+            <AlertCircle size={20} className="text-red-500" />
           )}
-          <span className="text-sm font-medium">{toast.text}</span>
+          <span className="text-sm font-semibold text-gray-800">
+            {toast.text}
+          </span>
         </div>
       )}
 
-      <div className="relative bg-white rounded-2xl shadow hover:shadow-xl transition duration-300 p-4 flex flex-col group overflow-visible">
-        {discountInfo && (
-          <div className="absolute -top-3 -left-3 bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg z-20">
-            🔥{" "}
-            {discountInfo.type === "percent"
-              ? `-${discountInfo.value}%`
-              : discountInfo.type === "fixed"
-              ? `-${discountInfo.value.toLocaleString("vi-VN")}đ`
-              : discountInfo.name}
-          </div>
-        )}
+      {/* --- CARD CONTAINER --- */}
+      <div className="group relative flex flex-col h-full bg-white rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-transparent hover:border-gray-100">
+        {/* 1. IMAGE AREA */}
         <div
-          className="relative overflow-hidden rounded-xl cursor-pointer"
+          className="relative w-full aspect-[3/4] overflow-hidden bg-gray-100 cursor-pointer"
           onClick={() => navigate(`/product/${product._id}`)}
         >
           <img
             src={selectedImage}
             alt={product.name}
-            className="w-full h-52 object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
+
+          {/* Discount Badge */}
+          {discountInfo && (
+            <div className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded-sm z-10">
+              {discountInfo.type === "percent"
+                ? `-${discountInfo.value}%`
+                : "SALE"}
+            </div>
+          )}
+
+          {/* Overlay Actions (Desktop) */}
+          <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
 
-        {selectedVariant?.images?.length > 1 && (
-          <div className="flex gap-2 mt-2">
-            {selectedVariant.images.map((img, idx) => (
-              <button
-                key={idx}
-                onClick={() => setSelectedImage(img)}
-                className={`w-12 h-12 rounded-lg border-2 overflow-hidden transition ${
-                  selectedImage === img
-                    ? "border-red-500 scale-105"
-                    : "border-gray-300 hover:border-gray-500"
-                }`}
-              >
-                <img
-                  src={img}
-                  alt={idx}
-                  className="w-full h-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
-        )}
+        {/* 2. INFO AREA */}
+        <div className="p-4 flex flex-col flex-grow">
+          {/* Variant Selector (Thumbnails) */}
+          {product.variants?.length > 1 && (
+            <div className="flex gap-2 mb-3 overflow-x-auto no-scrollbar">
+              {product.variants.map((variant) => (
+                <button
+                  key={variant._id}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedVariant(variant);
+                    setSelectedImage(getVariantImage(variant));
+                  }}
+                  className={`w-8 h-8 rounded-full border border-gray-200 overflow-hidden transition-all flex-shrink-0 ${
+                    selectedVariant?._id === variant._id
+                      ? "ring-1 ring-gray-900 ring-offset-1"
+                      : "hover:border-gray-400"
+                  }`}
+                  title={variant.color}
+                >
+                  <img
+                    src={getVariantImage(variant)}
+                    alt={variant.color}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
 
-        <h3 className="font-semibold text-gray-800 text-sm line-clamp-2 mt-3 mb-1">
-          {product.name}{" "}
-          {selectedVariant?.color && `- ${selectedVariant.color}`}
-        </h3>
-        {product.averageRating > 0 && (
+          {/* Product Name */}
+          <h3
+            className="font-medium text-gray-900 text-sm md:text-base line-clamp-2 mb-1 cursor-pointer hover:text-red-600 transition-colors"
+            onClick={() => navigate(`/product/${product._id}`)}
+          >
+            {product.name}{" "}
+            {selectedVariant?.color ? `(${selectedVariant.color})` : ""}
+          </h3>
+
+          {/* Rating */}
           <div className="flex items-center gap-1 mb-2">
-            {Array.from({ length: 5 }).map((_, i) => {
-              const rating = product.averageRating;
-              const diff = rating - i;
-
-              let starClass = "text-gray-300"; // sao trống
-              if (diff >= 1) starClass = "text-yellow-400"; // sao đầy
-              else if (diff > 0) starClass = "text-yellow-400/50"; // sao nửa
-
-              return <Star key={i} size={16} className={starClass} />;
-            })}
-            <span className="text-gray-500 text-xs ml-1">
-              {product.averageRating.toFixed(1)}/5
+            <div className="flex text-yellow-400">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={i}
+                  size={12}
+                  fill={
+                    i < Math.round(product.averageRating || 5)
+                      ? "currentColor"
+                      : "none"
+                  }
+                  className={
+                    i < Math.round(product.averageRating || 5)
+                      ? ""
+                      : "text-gray-300"
+                  }
+                />
+              ))}
+            </div>
+            <span className="text-xs text-gray-400">
+              ({product.reviewCount || 0})
             </span>
           </div>
-        )}
 
-        {discountedPrice < product.price ? (
-          <div className="mb-2">
-            <p className="text-red-600 font-bold text-base">
-              {discountedPrice.toLocaleString("vi-VN")}đ
-            </p>
-            <p className="text-gray-400 text-sm line-through">
-              {product.price.toLocaleString("vi-VN")}đ
-            </p>
+          {/* Price */}
+          <div className="mt-auto flex flex-col items-start gap-1">
+            {discountedPrice < product.price ? (
+              <div className="flex items-baseline gap-2">
+                <span className="text-red-600 font-bold text-base md:text-lg">
+                  {discountedPrice.toLocaleString("vi-VN")}đ
+                </span>
+                <span className="text-gray-400 text-xs md:text-sm line-through decoration-gray-400">
+                  {product.price.toLocaleString("vi-VN")}đ
+                </span>
+              </div>
+            ) : (
+              <span className="text-gray-900 font-bold text-base md:text-lg">
+                {product.price.toLocaleString("vi-VN")}đ
+              </span>
+            )}
           </div>
-        ) : (
-          <p className="text-red-600 font-bold text-base mb-2">
-            {product.price.toLocaleString("vi-VN")}đ
-          </p>
-        )}
 
-        {product.variants?.length > 0 && (
-          <div className="flex gap-2 mb-3">
-            {product.variants.map((variant) => (
-              <button
-                key={variant._id}
-                onClick={() => {
-                  setSelectedVariant(variant);
-                  setSelectedImage(getVariantImage(variant));
-                }}
-                className={`w-8 h-8 rounded-full border-2 overflow-hidden transition
-                  ${
-                    selectedVariant?._id === variant._id
-                      ? "border-red-500 scale-110"
-                      : "border-gray-300 hover:border-gray-500"
-                  }`}
-                title={variant.color}
-              >
-                <img
-                  src={getVariantImage(variant)}
-                  alt={variant.color}
-                  className="w-full h-full object-cover rounded-full"
-                />
-              </button>
-            ))}
-          </div>
-        )}
+          {/* 3. ADD TO CART BUTTON (Minimalist) */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const token = localStorage.getItem("token");
 
-        <button
-          onClick={() => {
-            const token = localStorage.getItem("token");
+              if (!token) {
+                showToast("Vui lòng đăng nhập!", "error");
+                setTimeout(() => navigate("/login?redirect=cart"), 1500);
+                return;
+              }
 
-            if (!token) {
-              showToast("Vui lòng đăng nhập để mua hàng!", "error");
-              setTimeout(() => navigate("/login?redirect=cart"), 1500);
-              return;
-            }
+              const variant =
+                product.variants?.length > 0 ? selectedVariant : null;
+              if (product.variants?.length > 0 && !variant) {
+                showToast("Vui lòng chọn màu!", "error");
+                return;
+              }
 
-            // ✅ Lấy variant (nếu sản phẩm có màu)
-            const variant =
-              product.variants?.length > 0 ? selectedVariant : null;
+              const sizeObj =
+                variant?.sizes?.length > 0 ? variant.sizes[0] : null;
+              const stock =
+                sizeObj?.stock ?? variant?.stock ?? product.stock ?? 0;
 
-            // Nếu có variants nhưng user chưa chọn -> yêu cầu chọn màu
-            if (product.variants?.length > 0 && !variant) {
-              showToast("Vui lòng chọn màu!", "error");
-              return;
-            }
+              if (stock <= 0) {
+                showToast("Hết hàng!", "error");
+                return;
+              }
 
-            // ✅ Lấy size (nếu variant có size)
-            const sizeObj =
-              variant?.sizes?.length > 0
-                ? variant.sizes[0] // hoặc size user chọn
-                : null;
+              addToCart({
+                productId: product._id,
+                color: variant?.color ?? null,
+                size: sizeObj?.size ?? null,
+                image: selectedImage,
+                quantity: 1,
+                price: product.price,
+                salePrice: discountedPrice,
+              });
 
-            // ✅ Xác định stock → ưu tiên size → rồi đến variant → cuối cùng product
-            const stock =
-              sizeObj?.stock ?? variant?.stock ?? product.stock ?? 0;
-
-            if (stock <= 0) {
-              showToast("Sản phẩm đã hết hàng!", "error");
-              return;
-            }
-
-            // ✅ Kiểm tra giỏ hàng
-            const cartData = JSON.parse(localStorage.getItem("cart")) || [];
-
-            const existingItem = cartData.find(
-              (item) =>
-                item.productId === product._id &&
-                item.color === (variant?.color ?? null) &&
-                item.size === (sizeObj?.size ?? null)
-            );
-
-            const currentQty = existingItem ? existingItem.quantity : 0;
-
-            if (currentQty + 1 > stock) {
-              showToast(`Chỉ còn ${stock} sản phẩm!`, "error");
-              return;
-            }
-
-            // ✅ Thêm vào giỏ
-            addToCart({
-              productId: product._id,
-              color: variant?.color ?? null,
-              size: sizeObj?.size ?? null,
-              image: selectedImage,
-              quantity: 1,
-              price: product.price,
-              salePrice: discountedPrice,
-            });
-
-            showToast("Đã thêm sản phẩm vào giỏ hàng!");
-          }}
-          className="mt-auto flex items-center justify-center gap-2 bg-red-600 text-white py-2 rounded-lg font-medium hover:bg-yellow-400 hover:text-gray-900 transition"
-        >
-          <ShoppingCart className="h-4 w-4" />
-          Thêm vào giỏ
-        </button>
+              showToast("Đã thêm vào giỏ!", "success");
+            }}
+            className="w-full mt-4 flex items-center justify-center gap-2 bg-gray-900 text-white text-sm font-bold py-3 rounded-lg hover:bg-red-600 transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-red-500/20 active:scale-95"
+          >
+            <ShoppingCart size={16} />
+            Thêm vào giỏ
+          </button>
+        </div>
       </div>
     </>
   );

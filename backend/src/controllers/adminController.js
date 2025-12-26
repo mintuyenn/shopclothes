@@ -4,7 +4,7 @@ import Product from "../models/productModel.js";
 import Category from "../models/categogyModel.js";
 import Discount from "../models/discountModel.js"; // Tạo model Mã giảm giá
 
-// 📊 1. Thống kê Dashboard
+// 1. Thống kê Dashboard
 export const getDashboardStats = async (req, res) => {
   try {
     // Tổng doanh thu (chỉ tính đơn đã hoàn thành)
@@ -63,7 +63,7 @@ export const getDashboardStats = async (req, res) => {
   }
 };
 
-// 👥 2. Quản lý Users
+// 2. Quản lý Users
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find({ role: "user" })
@@ -106,7 +106,7 @@ export const updateOrderStatus = async (req, res) => {
       return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
 
     // CHỈ TRỪ KHO KHI:
-    // - chuyển sang "Đang giao"
+    // - chuyển sang "Đang giao" hoặc Đã hoàn thành"
     const shouldSubtractStock =
       (status === "Đang giao" && order.orderStatus !== "Đang giao") ||
       (status === "Đã hoàn thành" && order.orderStatus !== "Đã hoàn thành");
@@ -123,10 +123,9 @@ export const updateOrderStatus = async (req, res) => {
 
         const variant = product.variants[variantIndex];
 
-        // ============================
         // TRƯỜNG HỢP 1: size = "Free"
         // → trừ stock theo màu
-        // ============================
+
         if (item.size === "Free") {
           const sizeIndex = variant.sizes.findIndex((s) => s.size === "Free");
           if (sizeIndex !== -1) {
@@ -136,10 +135,8 @@ export const updateOrderStatus = async (req, res) => {
           }
         }
 
-        // ============================
         // TRƯỜNG HỢP 2: size khác "Free"
         // → trừ theo size đúng
-        // ============================
         else {
           const sizeIndex = variant.sizes.findIndex(
             (s) => s.size === item.size
@@ -171,10 +168,6 @@ export const updateOrderStatus = async (req, res) => {
     res.status(500).json({ message: "Lỗi server" });
   }
 };
-
-// ==========================================
-// QUẢN LÝ SẢN PHẨM (NÂNG CẤP VARIANTS)
-// ==========================================
 
 // 1. Lấy danh sách
 export const getAllProductsAdmin = async (req, res) => {
@@ -298,7 +291,7 @@ export const updateProductAdmin = async (req, res) => {
         });
         product.countInStock = newTotalStock;
 
-        product.markModified("variants"); // lưu mảng lồng nhau
+        product.markModified("variants");
       }
 
       const updatedProduct = await product.save();
@@ -316,7 +309,6 @@ export const updateProductAdmin = async (req, res) => {
   }
 };
 
-// 4. Xóa sản phẩm
 export const deleteProductAdmin = async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
@@ -326,7 +318,6 @@ export const deleteProductAdmin = async (req, res) => {
   }
 };
 
-// 1. Lấy danh sách mã giảm giá
 export const getAllDiscounts = async (req, res) => {
   try {
     const discounts = await Discount.find().sort({ createdAt: -1 });

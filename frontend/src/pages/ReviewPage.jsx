@@ -13,6 +13,7 @@ const ReviewPage = () => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
+  const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
   const submitReview = async () => {
     if (rating === 0) {
@@ -27,7 +28,7 @@ const ReviewPage = () => {
     setLoading(true);
     try {
       await axios.post(
-        `http://localhost:5001/api/reviews`,
+        `${API_URL}/reviews`,
         { productId, rating, comment },
         { headers: { Authorization: `Bearer ${token}` } }
       );
