@@ -43,8 +43,27 @@ export const upload = multer({ storage });
 // ------------------- MIDDLEWARE -------------------
 app.use(express.json());
 app.set("trust proxy", 1); // nếu sử dụng proxy/nginx/ngrok
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
-app.use(cors({ origin: FRONTEND_URL, credentials: true }));
+// --- CẤU HÌNH CORS MỚI (AN TOÀN HƠN) ---
+const allowedOrigins = [
+  "http://localhost:5173", // Cho phép chạy ở máy nhà
+  "https://shopclothes-production.up.railway.app", // Cho phép chạy trên Railway Frontend
+  process.env.FRONTEND_URL, // Cho phép biến môi trường (nếu có)
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Cho phép requests không có origin (như Postman, Mobile App) hoặc nằm trong danh sách cho phép
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log("CORS blocked:", origin); // Log ra để biết nếu bị chặn
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 // ------------------- ROUTES EXISTING -------------------
 app.use("/api/auth", authRoutes);
