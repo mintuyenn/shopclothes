@@ -131,6 +131,9 @@ const Header = () => {
   const [categories, setCategories] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [placeholder, setPlaceholder] = useState("");
+  // ✅ Fix URL: Đảm bảo không bị double slash
+  const BASE_URL = import.meta.env.VITE_API_URL || "";
+  const API_URL = `${BASE_URL.replace(/\/$/, "")}/api`;
 
   // Logic placeholder typewriter
   useEffect(() => {
@@ -167,7 +170,7 @@ const Header = () => {
 
   // Fetch Categories
   useEffect(() => {
-    fetch("http://localhost:5001/api/categories?tree=true")
+    fetch(`${API_URL}/categories?tree=true`)
       .then((res) => res.json())
       .then((data) => setCategories(data))
       .catch((err) => console.error(err));
