@@ -16,10 +16,8 @@ import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
+import wishlishRoutes from "./routes/wishlistRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
-import Order from "./models/orderModel.js";
-import Product from "./models/productModel.js";
-import Category from "./models/categogyModel.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import "./config/passport.js";
 
@@ -63,7 +61,7 @@ app.use(
     },
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
-  })
+  }),
 );
 
 // ------------------- ROUTES EXISTING -------------------
@@ -75,6 +73,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/wishlist", wishlishRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/ai", aiRoutes);
 

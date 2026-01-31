@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-// --- SỬA LỖI TẠI ĐÂY: Dùng named import ---
+// Framer Motion & Icons
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ShoppingCart,
@@ -54,9 +54,7 @@ const ProductDetailPage = () => {
         setSelectedImage(v?.images?.[0] || p.images?.[0] || "/placeholder.png");
 
         // Sold
-        const soldRes = await axios.get(
-          `${API_URL}/orders/sold/${id}`
-        );
+        const soldRes = await axios.get(`${API_URL}/orders/sold/${id}`);
         setSold(soldRes.data.sold ?? 0);
       } catch (err) {
         console.error(err);
@@ -123,7 +121,7 @@ const ProductDetailPage = () => {
       (item) =>
         item.productId === product._id &&
         (variant ? item.color === variant.color : true) &&
-        (sizeObj ? item.size === sizeObj.size : true)
+        (sizeObj ? item.size === sizeObj.size : true),
     );
     const currentQty = existingItem ? existingItem.quantity : 0;
     if (currentQty + quantity > stock) {
@@ -502,6 +500,26 @@ const ProductDetailPage = () => {
                         {new Date(r.createdAt).toLocaleDateString("vi-VN")}
                       </span>
                     </div>
+                    {/* Size & Color */}
+                    {(r.color || r.size) && (
+                      <div className="text-xs text-slate-500 mb-2 flex flex-wrap gap-2">
+                        {r.color && (
+                          <span className="px-2 py-0.5 bg-white border border-gray-200 rounded-sm">
+                            Màu:{" "}
+                            <strong className="text-slate-900">
+                              {r.color}
+                            </strong>
+                          </span>
+                        )}
+                        {r.size && (
+                          <span className="px-2 py-0.5 bg-white border border-gray-200 rounded-sm">
+                            Size:{" "}
+                            <strong className="text-slate-900">{r.size}</strong>
+                          </span>
+                        )}
+                      </div>
+                    )}
+
                     <p className="text-slate-600 text-sm leading-relaxed bg-gray-50 p-3 rounded-sm">
                       {r.comment}
                     </p>

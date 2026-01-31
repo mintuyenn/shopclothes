@@ -349,22 +349,6 @@ const Home = () => {
                           product={p}
                           activeVariant={activeVariant}
                         />
-
-                        {/* Hover Overlay Desktop: Quick Action */}
-                        <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0">
-                          <button
-                            className="bg-white p-2 rounded-full shadow-md hover:bg-black hover:text-white transition-colors"
-                            title="Xem nhanh"
-                          >
-                            <Eye size={18} />
-                          </button>
-                          <button
-                            className="bg-white p-2 rounded-full shadow-md hover:bg-rose-600 hover:text-white transition-colors"
-                            title="Thêm vào giỏ"
-                          >
-                            <ShoppingBag size={18} />
-                          </button>
-                        </div>
                       </div>
                     </div>
                   </Motion.motion.div>

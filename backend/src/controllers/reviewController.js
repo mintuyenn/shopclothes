@@ -4,57 +4,103 @@ import Order from "../models/orderModel.js";
 
 export const createReview = async (req, res) => {
   try {
-    const { productId, rating, comment } = req.body;
-    const userId = req.user.id;
+    const { productId, orderId, rating, comment, color, size } = req.body;
+    const userId = req.user._id;
 
-    if (!productId || !rating) {
-      return res.status(400).json({ message: "Thiếu productId hoặc rating" });
+    if (!productId || !rating || !orderId) {
+      return res.status(400).json({
+        message: "Thiếu productId, orderId hoặc rating",
+      });
     }
 
-    // Kiểm tra user đã mua sản phẩm và đơn hàng đã hoàn thành chưa
-    const purchased = await Order.findOne({
+    // 1. Kiểm tra đơn hàng hợp lệ & đã hoàn thành
+    const order = await Order.findOne({
+      _id: orderId,
       userId,
       orderStatus: "Đã hoàn thành",
-      "items.productId": productId,
     });
 
-    if (!purchased) {
-      return res
-        .status(400)
-        .json({ message: "Chỉ có thể đánh giá sản phẩm đã mua và hoàn thành" });
+    if (!order) {
+      return res.status(400).json({
+        message: "Bạn chỉ có thể đánh giá sản phẩm từ đơn hàng đã hoàn thành",
+      });
     }
 
-    // Kiểm tra người dùng đã review chưa
-    const existingReview = await Review.findOne({ productId, userId });
-    if (existingReview) {
-      return res.status(400).json({ message: "Bạn đã đánh giá sản phẩm này" });
+    // 2. Kiểm tra sản phẩm có trong đơn hàng không
+    const hasProduct = order.items.find(
+      (item) => item.productId.toString() === productId,
+    );
+
+    if (!hasProduct) {
+      return res.status(400).json({
+        message: "Sản phẩm không tồn tại trong đơn hàng này",
+      });
     }
 
-    const review = new Review({
-      productId,
+    // 3. Kiểm tra đã review sản phẩm này chưa (theo user + product + order)
+    const existingReview = await Review.findOne({
       userId,
+      productId,
+      orderId,
+    });
+
+    if (existingReview) {
+      return res.status(400).json({
+        message: "Bạn đã đánh giá sản phẩm này rồi",
+      });
+    }
+
+    // 4. Tạo review
+    const review = await Review.create({
+      userId,
+      productId,
+      orderId,
       rating,
       comment,
+      color,
+      size,
     });
 
-    await review.save();
-
-    // Cập nhật trung bình đánh giá và số review trên Product
+    // 5. Cập nhật điểm trung bình & số lượng review cho Product
     const reviews = await Review.find({ productId });
     const numReviews = reviews.length;
     const averageRating =
-      reviews.reduce((acc, item) => acc + item.rating, 0) / numReviews;
+      reviews.reduce((sum, r) => sum + r.rating, 0) / numReviews;
 
     await Product.findByIdAndUpdate(productId, {
-      averageRating,
       numReviews,
+      averageRating,
     });
 
-    res
-      .status(201)
-      .json({ success: true, message: "Đánh giá thành công", review });
+    res.status(201).json({
+      success: true,
+      message: "Đánh giá của bạn đã được ghi nhận!",
+      data: review,
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Lỗi server", error: error.message });
+    if (error.code === 11000) {
+      return res.status(400).json({
+        message: "Bạn đã đánh giá sản phẩm này rồi",
+      });
+    }
+
+    res.status(500).json({
+      message: "Lỗi hệ thống",
+      error: error.message,
+    });
+  }
+};
+
+export const getProductReviews = async (req, res) => {
+  try {
+    const reviews = await Review.find({
+      productId: req.params.productId,
+    })
+      .populate("userId", "username avatar")
+      .sort("-createdAt");
+
+    res.json(reviews);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi lấy đánh giá" });
   }
 };

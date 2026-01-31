@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import ReviewModal from "./ReviewModal.jsx";
 import { useAuth } from "../context/AuthContext";
 import {
   ArrowLeft,
@@ -38,6 +39,10 @@ const OrderDetailPage = () => {
   const { token } = useAuth();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [reviewedItems, setReviewedItems] = useState([]);
+
   const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
   useEffect(() => {
@@ -74,7 +79,7 @@ const OrderDetailPage = () => {
         const res = await axios.put(
           `${API_URL}/orders/${order._id}/cancel`,
           {},
-          { headers: { Authorization: `Bearer ${token}` } }
+          { headers: { Authorization: `Bearer ${token}` } },
         );
 
         Swal.fire("Đã hủy!", res.data.message, "success");
@@ -83,7 +88,7 @@ const OrderDetailPage = () => {
         Swal.fire(
           "Lỗi",
           err.response?.data?.message || "Hủy thất bại",
-          "error"
+          "error",
         );
       }
     }
@@ -161,7 +166,7 @@ const OrderDetailPage = () => {
                 style={{
                   width: `${Math.max(
                     0,
-                    Math.min(100, (currentStep / 3) * 100)
+                    Math.min(100, (currentStep / 3) * 100),
                   )}%`,
                 }}
               ></div>
@@ -197,7 +202,7 @@ const OrderDetailPage = () => {
                       </p>
                     </div>
                   );
-                }
+                },
               )}
             </div>
           </div>
@@ -303,14 +308,24 @@ const OrderDetailPage = () => {
                     <div className="flex justify-between items-center mt-2">
                       <p className="text-sm text-gray-500">x{item.quantity}</p>
 
-                      {/* Nút đánh giá chỉ hiện khi hoàn thành */}
-                      {order.orderStatus === "Giao thành công" && (
-                        <button
-                          onClick={() => navigate(`/product/${item.productId}`)} // Hoặc link đến trang review
-                          className="text-blue-600 text-sm hover:underline font-medium"
-                        >
-                          Viết đánh giá
-                        </button>
+                      {/* ✅ Kiểm tra trạng thái "Đã hoàn thành" và kiểm tra xem đã đánh giá chưa */}
+                      {order.orderStatus === "Đã hoàn thành" && (
+                        <div>
+                          {reviewedItems.includes(item.productId) ? (
+                            // Nếu ID sản phẩm nằm trong danh sách đã đánh giá -> Hiện chữ này
+                            <span className="text-green-600 text-xs font-bold italic bg-green-50 px-2 py-1 rounded">
+                              ✓ Đã đánh giá
+                            </span>
+                          ) : (
+                            // Nếu chưa có trong danh sách -> Hiện nút bấm
+                            <button
+                              onClick={() => setSelectedItem(item)}
+                              className="text-blue-600 text-sm hover:underline font-medium border border-blue-200 px-3 py-1 rounded-lg hover:bg-blue-50 transition-all"
+                            >
+                              Viết đánh giá
+                            </button>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -366,6 +381,17 @@ const OrderDetailPage = () => {
           </div>
         </div>
       </div>
+      {selectedItem && (
+        <ReviewModal
+          item={selectedItem}
+          orderId={order._id}
+          token={token}
+          onClose={() => setSelectedItem(null)}
+          onReviewSuccess={(prodId) =>
+            setReviewedItems((prev) => [...prev, prodId])
+          }
+        />
+      )}
     </div>
   );
 };

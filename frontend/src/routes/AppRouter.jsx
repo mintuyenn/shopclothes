@@ -30,6 +30,7 @@ import ReviewPage from "../pages/ReviewPage";
 import UserLayout from "../layouts/UserLayout";
 import NewArrivals from "../pages/NewArrivals";
 import LoginSuccess from "../pages/LoginSuccess";
+import WishlistPage from "../pages/WishlistPage";
 
 // --- Admin Components (NEW) ---
 import AdminLayout from "../layouts/AdminLayout";
@@ -72,6 +73,17 @@ export default function AppRouter() {
               </PrivateRoute>
             }
           />
+
+             {/* Private User Routes */}
+          <Route
+            path="/wishlist"
+            element={
+              <PrivateRoute>
+                <WishlistPage />
+              </PrivateRoute>
+            }
+          />
+
 
           <Route
             path="/checkout"

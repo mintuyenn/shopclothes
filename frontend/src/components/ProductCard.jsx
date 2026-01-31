@@ -5,24 +5,27 @@ import {
   CheckCircle,
   AlertCircle,
   Star,
-  Eye,
+  Heart,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
 
 const ProductCard = ({ product, activeVariant = null }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { wishlist, toggleWishlist } = useWishlist();
+  const isWishlisted = wishlist.includes(product._id);
 
   const [selectedVariant, setSelectedVariant] = useState(
-    activeVariant || product.variants?.[0] || null
+    activeVariant || product.variants?.[0] || null,
   );
 
   const [selectedImage, setSelectedImage] = useState(
     activeVariant?.images?.[0] ||
       product.variants?.[0]?.images?.[0] ||
       product.images?.[0] ||
-      "/placeholder.png"
+      "/placeholder.png",
   );
 
   const [toast, setToast] = useState(null);
@@ -31,7 +34,7 @@ const ProductCard = ({ product, activeVariant = null }) => {
     if (activeVariant) {
       setSelectedVariant(activeVariant);
       setSelectedImage(
-        activeVariant.images?.[0] || product.images?.[0] || "/placeholder.png"
+        activeVariant.images?.[0] || product.images?.[0] || "/placeholder.png",
       );
     }
   }, [activeVariant, product]);
@@ -78,6 +81,31 @@ const ProductCard = ({ product, activeVariant = null }) => {
           className="relative w-full aspect-[3/4] overflow-hidden bg-gray-100 cursor-pointer"
           onClick={() => navigate(`/product/${product._id}`)}
         >
+          <button
+            onClick={async (e) => {
+              e.stopPropagation();
+              try {
+                await toggleWishlist(product._id);
+                showToast(
+                  isWishlisted ? "Đã bỏ yêu thích" : "Đã thêm vào yêu thích",
+                  "success",
+                );
+              } catch {
+                showToast("Vui lòng đăng nhập!", "error");
+                setTimeout(() => navigate("/login"), 1500);
+              }
+            }}
+            className={`absolute top-3 right-3 z-20 p-2 rounded-full backdrop-blur-md transition-all
+    ${
+      isWishlisted
+        ? "bg-red-600 text-white"
+        : "bg-white/90 text-gray-700 hover:text-red-600"
+    }
+  `}
+          >
+            <Heart size={16} fill={isWishlisted ? "currentColor" : "none"} />
+          </button>
+
           <img
             src={selectedImage}
             alt={product.name}
@@ -157,7 +185,7 @@ const ProductCard = ({ product, activeVariant = null }) => {
               ))}
             </div>
             <span className="text-xs text-gray-400">
-              ({product.reviewCount || 0})
+              ({product.numReviews || 0})
             </span>
           </div>
 

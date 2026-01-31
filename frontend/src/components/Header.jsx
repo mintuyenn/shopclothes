@@ -217,6 +217,13 @@ const Header = () => {
           <div className="flex items-center gap-1 md:gap-4 shrink-0">
             {/* Store Locator (Icon only) */}
             <Link
+              to="/wishlist"
+              className="p-2 text-gray-500 hover:text-black transition hidden lg:block"
+              title="Yêu thích"
+            >
+              <Heart size={22} />
+            </Link>
+            <Link
               to="/store-system"
               className="p-2 text-gray-500 hover:text-black transition hidden lg:block"
               title="Hệ thống cửa hàng"

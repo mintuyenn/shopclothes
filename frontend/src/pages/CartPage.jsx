@@ -125,7 +125,7 @@ const CartPage = () => {
                         {/* 1. INFO & IMAGE */}
                         <div className="sm:col-span-6 flex gap-4">
                           <Link
-                            to={`/products/${item.productId}`}
+                            to={`/product/${item.productId}`}
                             className="shrink-0 relative group overflow-hidden rounded-lg border border-gray-200 w-24 h-32"
                           >
                             <img
@@ -137,7 +137,7 @@ const CartPage = () => {
 
                           <div className="flex flex-col justify-between py-1">
                             <div>
-                              <Link to={`/products/${item.productId}`}>
+                              <Link to={`/product/${item.productId}`}>
                                 <h3 className="font-bold text-gray-900 hover:text-red-600 transition-colors line-clamp-2 mb-1">
                                   {item.name}
                                 </h3>
